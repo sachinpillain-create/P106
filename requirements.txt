@@ -1,0 +1,42 @@
+# --- Core backend (CPU-only, required) ---
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+sqlalchemy==2.0.35
+pydantic==2.9.2
+
+# --- Forensics / networking ---
+dnspython==2.6.1
+dkimpy==1.1.6
+
+# --- Content safety ---
+bleach==6.1.0
+
+# --- Evidence encryption & report signing (Phase 2) ---
+cryptography==43.0.1
+
+# --- ML: Stage A baseline (CPU-only, always required) ---
+scikit-learn==1.5.2
+pandas==2.2.3
+joblib==1.4.2
+
+# --- Graph correlation ---
+networkx==3.3
+
+# --- Reporting ---
+reportlab==4.2.5
+
+# --- GeoIP (optional but recommended — see data/geoip/README.md) ---
+geoip2==4.8.0
+
+# --- ML: Stage B transformer (GPU-accelerated, install separately) ---
+# These are NOT pinned here because the correct PyTorch build depends on
+# your CUDA version. On your laptop (RTX 3050, Windows 11), install with:
+#
+#   pip install torch --index-url https://download.pytorch.org/whl/cu121
+#   pip install transformers accelerate
+#
+# See GUIDE.md Section 4 for full CUDA setup instructions.
+# torch
+# transformers
+# accelerate

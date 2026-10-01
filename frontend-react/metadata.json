@@ -1,0 +1,6 @@
+{
+  "name": "Forensic Intelligence Workbench",
+  "description": "Tactical cybersecurity forensic analysis workbench for deep email threat investigation, memory triage, packet streams, and incident telemetry.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

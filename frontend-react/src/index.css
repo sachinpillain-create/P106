@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-headline: 'Plus Jakarta Sans', sans-serif;
+
+  --color-surface-dim: #0c1322;
+  --color-surface-bright: #32394a;
+  --color-surface: #0c1322;
+  --color-surface-lowest: #070e1d;
+  --color-surface-low: #151b2b;
+  --color-surface-container: #191f2f;
+  --color-surface-high: #232a3a;
+  --color-surface-highest: #2e3545;
+
+  --color-on-surface: #dce2f8;
+  --color-on-surface-variant: #bbc9cf;
+  --color-outline: #859398;
+  --color-outline-variant: #3c494e;
+
+  --color-primary: #a8e8ff;
+  --color-primary-container: #00d4ff;
+  --color-primary-fixed: #b4ebff;
+  --color-on-primary: #003642;
+
+  --color-secondary: #ffb1c0;
+  --color-secondary-container: #e00363;
+  --color-on-secondary: #660029;
+
+  --color-tertiary: #6af7ba;
+  --color-tertiary-container: #49da9f;
+  --color-on-tertiary-fixed-variant: #005236;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+    background-color: #070e1d;
+    color: #dce2f8;
+  }
+}
+
+/* Custom scrollbar for tactical panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0c1322;
+}
+::-webkit-scrollbar-thumb {
+  background: #232a3a;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3c494e;
+}
+

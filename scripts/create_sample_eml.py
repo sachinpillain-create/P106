@@ -1,0 +1,75 @@
+"""
+Generates a crafted phishing .eml for demo/testing purposes (PRD Section 20:
+Demo Scenario — "Upload a crafted phishing .eml that impersonates a known
+organization").
+
+This is synthetic test data only — no real organization, sender, or IP is
+represented. Run:
+    python scripts/create_sample_eml.py
+"""
+import os
+
+EML_CONTENT = """Delivered-To: victim@example-college.edu
+Received: by 10.10.10.10 with SMTP id abc123;
+    Mon, 01 Sep 2025 08:15:22 -0700 (PDT)
+Received: from mail.internal-relay.example.com (mail.internal-relay.example.com. [10.20.30.40])
+    by mx.google.com with ESMTPS id xyz789
+    for <victim@example-college.edu>;
+    Mon, 01 Sep 2025 08:15:20 -0700 (PDT)
+Received: from smtp-out.suspicious-host.net (smtp-out.suspicious-host.net. [185.220.101.45])
+    by mail.internal-relay.example.com with ESMTP id def456;
+    Mon, 01 Sep 2025 08:15:15 -0700 (PDT)
+Authentication-Results: mx.google.com;
+    spf=fail smtp.mailfrom=paypa1-secure.net;
+    dkim=none;
+    dmarc=fail
+Message-ID: <2025090108150077.ABCDEF@paypa1-secure.net>
+Date: Mon, 01 Sep 2025 08:15:00 -0700
+From: "PayPal Security Team" <alerts@paypa1-secure.net>
+Reply-To: recover-support@totally-legit-mail.ru
+Return-Path: <bounce@paypa1-secure.net>
+To: victim@example-college.edu
+Subject: Urgent: Your Account Will Be Suspended - Action Required
+Content-Type: multipart/alternative; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain; charset="utf-8"
+
+Dear Customer,
+
+We have detected unusual activity on your account. Your account will be
+suspended immediately unless you verify your identity within 24 hours.
+
+Please click here now to confirm your password and social security number:
+http://192.168.99.5:8080/paypal-verify/login?redirect=http://paypa1-secure.net
+
+This is a final notice. Action required immediately to avoid permanent
+suspension of your account.
+
+Thank you,
+PayPal Security Team
+
+--boundary123
+Content-Type: text/html; charset="utf-8"
+
+<html><body>
+<p>Dear Customer,</p>
+<p>We have detected <b>unusual activity</b> on your account. Your account
+will be <b>suspended immediately</b> unless you verify your identity within
+24 hours.</p>
+<p><a href="http://xn--pypal-4ve.com/verify">Click here now</a> to confirm
+your password and social security number.</p>
+<script>alert('this should never execute or render');</script>
+<p>This is a final notice.</p>
+</body></html>
+
+--boundary123--
+"""
+
+if __name__ == "__main__":
+    out_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "tests")
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, "sample_phishing.eml")
+    with open(out_path, "w") as f:
+        f.write(EML_CONTENT)
+    print(f"Wrote demo phishing email to {out_path}")

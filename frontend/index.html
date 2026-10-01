@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAALBHEDI — Email Threat & Forensic Intelligence</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-subtle: #162032;
+      --border: #334155;
+      --border-light: #475569;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --blue: #2563eb;
+      --blue-hover: #1d4ed8;
+      --green: #16a34a;
+      --green-bg: rgba(22, 163, 74, 0.15);
+      --amber: #d97706;
+      --amber-bg: rgba(217, 119, 6, 0.15);
+      --red: #dc2626;
+      --red-bg: rgba(220, 38, 38, 0.15);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 13.5px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Subdued, Clean Human-Made Background Logo */
+    .bg-logo {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.035;
+    }
+    .bg-logo svg {
+      width: 580px;
+      height: 580px;
+      max-width: 80vw;
+      max-height: 80vh;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Simple, Clean Desktop Header */
+    header {
+      background: #1e293b;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: #2563eb;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title span.tag {
+      font-size: 11px;
+      font-weight: 600;
+      background: #334155;
+      color: #cbd5e1;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .brand-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+    .dot.green { background: #22c55e; }
+    .dot.blue { background: #38bdf8; }
+    .dot.amber { background: #f59e0b; }
+
+    /* Clean, Standard Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-main);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 7px 13px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.12s ease;
+    }
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--blue-hover);
+    }
+    .btn-secondary {
+      background: #334155;
+      color: #f1f5f9;
+      border-color: #475569;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: #475569;
+    }
+    .btn-demo {
+      background: #854d0e;
+      color: #fef08a;
+      border-color: #a16207;
+    }
+    .btn-demo:hover:not(:disabled) {
+      background: #a16207;
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Single Window Desktop 2-Column Workspace */
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 18px;
+      padding: 18px 24px;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 980px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Simple, Clean Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 9px;
+      margin-bottom: 12px;
+    }
+
+    .card-title small {
+      font-weight: normal;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    /* Form Fields */
+    label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      margin-top: 10px;
+    }
+    label:first-of-type { margin-top: 0; }
+
+    input[type="text"], textarea {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 10px;
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-family: var(--font-main);
+    }
+    input[type="text"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+
+    textarea {
+      min-height: 85px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      resize: vertical;
+    }
+
+    /* Simple Clean File Upload Area */
+    .file-box {
+      border: 1.5px dashed var(--border);
+      background: #0f172a;
+      border-radius: 5px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .file-box:hover {
+      border-color: var(--border-light);
+    }
+    .file-box input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .file-box-text {
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .file-box-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .checkbox-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* Monospace Data Row */
+    .data-box {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 9px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #38bdf8;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+    .copy-btn:hover {
+      background: #334155;
+      color: #fff;
+    }
+
+    /* Threat Score Banner */
+    .score-summary {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px;
+      background: var(--card-subtle);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 14px;
+    }
+
+    .score-circle {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0f172a;
+      border: 3px solid var(--green);
+      flex-shrink: 0;
+    }
+    .score-number {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      font-family: var(--font-mono);
+    }
+    .score-unit {
+      font-size: 9.5px;
+      color: var(--text-muted);
+    }
+
+    .verdict-info {
+      flex: 1;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .badge.green { background: var(--green-bg); color: #4ade80; border: 1px solid #16a34a; }
+    .badge.amber { background: var(--amber-bg); color: #fbbf24; border: 1px solid #d97706; }
+    .badge.red { background: var(--red-bg); color: #f87171; border: 1px solid #dc2626; }
+    .badge.gray { background: #334155; color: #cbd5e1; }
+
+    .verdict-text {
+      font-size: 13px;
+      color: var(--text);
+    }
+    .verdict-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Clean Simple Tables */
+    table.simple-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    table.simple-table th, table.simple-table td {
+      padding: 7px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    table.simple-table th {
+      background: #0f172a;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    table.simple-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 10.5px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .pill.green { background: var(--green-bg); color: #4ade80; }
+    .pill.amber { background: var(--amber-bg); color: #fbbf24; }
+    .pill.red { background: var(--red-bg); color: #f87171; }
+    .pill.gray { background: #334155; color: #cbd5e1; }
+
+    /* Simple Reasons List */
+    .reasons-box {
+      background: var(--card-subtle);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 10px 14px;
+      margin-top: 10px;
+    }
+    .reasons-box h4 {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .reasons-box ul {
+      margin-left: 18px;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .reasons-box li {
+      margin-bottom: 3px;
+    }
+
+    /* 3D Global Internet Motion (Borderless & Expanded, Pure 3D, Zero Text) */
+    .motion-canvas-card {
+      position: relative;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 340px;
+      padding: 0;
+      box-shadow: none;
+    }
+    #motionCanvas3d {
+      width: 100%;
+      height: 340px;
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Desktop Footer Status Bar */
+    footer {
+      background: #1e293b;
+      border-top: 1px solid var(--border);
+      padding: 6px 24px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    footer strong {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Subdued, Human-Made Project Seal Watermark -->
+  <div class="bg-logo" aria-hidden="true">
+    <svg viewBox="0 0 400 400" fill="none" stroke="#475569" stroke-width="1.5">
+      <path d="M200 30 L350 90 L350 250 C350 320 200 380 200 380 C200 380 50 320 50 250 L50 90 Z" />
+      <circle cx="200" cy="200" r="100" stroke-dasharray="4 4"/>
+      <circle cx="200" cy="200" r="60"/>
+      <line x1="200" y1="100" x2="200" y2="300"/>
+      <line x1="100" y1="200" x2="300" y2="200"/>
+      <polygon points="200,120 220,180 200,170 180,180" fill="#475569"/>
+      <text x="200" y="325" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="20" font-weight="700" fill="#475569">JAALBHEDI</text>
+      <text x="200" y="345" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="11" fill="#475569">जालभेदी · SIH 26106</text>
+    </svg>
+  </div>
+
+  <div class="app-container">
+
+    <!-- Simple, Clean Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            JAALBHEDI
+            <span class="tag">जालभेदी</span>
+            <span style="font-size:11.5px; font-weight:normal; color:var(--text-muted);">SIH 26106</span>
+          </div>
+          <div class="brand-sub">AI-Powered Email Threat Detection &amp; Forensic Intelligence</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="newCaseBtn">
+          + New Case
+        </button>
+        <div class="status-badge" id="backendBadge">
+          <span class="dot green" id="backendDot"></span>
+          <span id="backendText">Server Ready</span>
+        </div>
+        <div class="status-badge" id="gpuBadge">
+          <span class="dot blue" id="gpuDot"></span>
+          <span id="gpuText">CPU ML</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Unified Single-Window 2-Column Workspace -->
+    <main class="workspace">
+
+      <!-- LEFT COLUMN: INPUT & EVIDENCE -->
+      <section class="column">
+
+        <!-- 1. Email Intake -->
+        <div class="card">
+          <div class="card-title">
+            1. Select or Paste Email
+            <small>RFC 822 / .eml format</small>
+          </div>
+
+          <!-- File upload box -->
+          <div class="file-box" id="dropzone">
+            <input type="file" id="emlFile" accept=".eml,.txt,.msg">
+            <div class="file-box-text" id="fileNameDisplay">Choose an .eml file or drag here</div>
+            <div class="file-box-hint">Standard email export from Outlook, Gmail, or Thunderbird</div>
+          </div>
+
+          <label>Or paste raw email content</label>
+          <textarea id="rawText" placeholder="Delivered-To: victim@example.com&#10;Received: from mail.server.com...&#10;Subject: Urgent: Verify Account..."></textarea>
+
+          <label class="checkbox-line">
+            <input type="checkbox" id="enableNetwork" checked>
+            <span>Perform live DNS / RDAP network lookups</span>
+          </label>
+
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn btn-secondary" id="uploadBtn" style="flex:1;">
+              Ingest &amp; Hash
+            </button>
+            <button class="btn btn-primary" id="analyzeBtn" disabled style="flex:1.4;">
+              Analyze Email &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Preserved Evidence Record -->
+        <div class="card">
+          <div class="card-title">
+            Evidence Information
+            <small>Immutable Record</small>
+          </div>
+
+          <label>Evidence SHA-256 Fingerprint</label>
+          <div class="data-box">
+            <span id="hashDisplay">Not ingested yet</span>
+            <button class="copy-btn" id="copyHashBtn" title="Copy Hash">Copy</button>
+          </div>
+
+          <label>Subject</label>
+          <div class="data-box" id="subjectDisplay">—</div>
+
+          <label>From</label>
+          <div class="data-box" id="fromDisplay">—</div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+            <div>
+              <label>Date</label>
+              <div class="data-box" id="dateDisplay" style="font-size:10.5px;">—</div>
+            </div>
+            <div>
+              <label>Vault Status</label>
+              <div class="data-box" style="color:#4ade80; font-size:10.5px;">Preserved</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Export Forensic Report -->
+        <div class="card">
+          <div class="card-title">
+            Export Forensic Report
+            <small>Court-Admissible</small>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+            Generate a signed PDF forensic report and JSON evidence artifact with full chain of custody.
+          </p>
+          <button class="btn btn-secondary" id="exportBtn" disabled style="width:100%;">
+            Generate Signed Report
+          </button>
+          <div id="reportLinks" style="display:none; margin-top:10px; display:flex; gap:8px;">
+            <a href="#" id="pdfLink" class="btn btn-primary" target="_blank" style="flex:1; text-align:center;">Download PDF</a>
+            <a href="#" id="jsonLink" class="btn btn-secondary" target="_blank" style="flex:1; text-align:center;">Download JSON</a>
+          </div>
+        </div>
+
+        <!-- Pure 3D Motion Internet Globe (Borderless & Expanded, Zero Text Content) -->
+        <div class="motion-canvas-card">
+          <canvas id="motionCanvas3d" width="380" height="340"></canvas>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: RESULTS & FINDINGS -->
+      <section class="column">
+
+        <!-- 4. Threat Score & Summary -->
+        <div class="card">
+          <div class="card-title">
+            Threat Analysis &amp; Verdict
+            <small id="confidenceLabel">Awaiting analysis</small>
+          </div>
+
+          <div class="score-summary">
+            <div class="score-circle" id="scoreCircle">
+              <div class="score-number" id="scoreValue">0</div>
+              <div class="score-unit">/ 100</div>
+            </div>
+            <div class="verdict-info">
+              <div class="badge gray" id="verdictBadge">READY</div>
+              <div class="verdict-text" id="verdictText">
+                Select an .eml file or paste raw email content on the left to start the analysis.
+              </div>
+              <div class="verdict-sub" id="verdictDetails">
+                Deterministic rules + Machine Learning classification
+              </div>
+            </div>
+          </div>
+
+          <!-- Plain-English Reasons -->
+          <div class="reasons-box" id="reasonsBox" style="display:none;">
+            <h4>Why was this flagged?</h4>
+            <ul id="reasonsList"></ul>
+          </div>
+        </div>
+
+        <!-- 5. Sender Authentication (SPF / DKIM / DMARC) -->
+        <div class="card">
+          <div class="card-title">
+            Sender Authentication
+            <small>SPF, DKIM &amp; DMARC</small>
+          </div>
+          <table class="simple-table">
+            <thead>
+              <tr>
+                <th>Protocol</th>
+                <th>Result</th>
+                <th>Source Header</th>
+              </tr>
+            </thead>
+            <tbody id="authTableBody">
+              <tr><td colspan="3" style="color:var(--text-muted); text-align:center; padding:12px;">No email analyzed yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 6. Relay Hops & Origin Location -->
+        <div class="card">
+          <div class="card-title">
+            Email Delivery Path &amp; Origin Location
+            <small id="originIpLabel">Probable Origin: Unknown</small>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div>
+              <label>Candidate Origin IP</label>
+              <div class="data-box" id="originIpBox">—</div>
+            </div>
+            <div>
+              <label>Estimated Location (GeoIP)</label>
+              <div class="data-box" id="originGeoBox">—</div>
+            </div>
+          </div>
+
+          <label>Received Relay Chain (From Origin to Destination)</label>
+          <table class="simple-table">
+            <thead>
+              <tr>
+                <th>Hop</th>
+                <th>IP Address</th>
+                <th>Host / Server</th>
+                <th>Trust Boundary</th>
+              </tr>
+            </thead>
+            <tbody id="hopsTableBody">
+              <tr><td colspan="4" style="color:var(--text-muted); text-align:center; padding:12px;">No hops parsed yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 7. Suspicious Links & Social Engineering Cues -->
+        <div class="card">
+          <div class="card-title">
+            Links &amp; Phishing Cues Found
+            <small id="linksCount">0 links found</small>
+          </div>
+          <table class="simple-table">
+            <thead>
+              <tr>
+                <th>URL / Link Extracted</th>
+                <th>Risk</th>
+                <th>Details / Flags</th>
+              </tr>
+            </thead>
+            <tbody id="urlsTableBody">
+              <tr><td colspan="3" style="color:var(--text-muted); text-align:center; padding:12px;">No links analyzed yet</td></tr>
+            </tbody>
+          </table>
+
+          <div id="cuesBox" style="margin-top:12px; display:none;">
+            <label>Urgency &amp; Social Engineering Phrases Detected</label>
+            <div id="cuesContent" style="font-size:12px; color:var(--text-muted); background:#0f172a; padding:8px 10px; border-radius:4px; border:1px solid var(--border);"></div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Simple Desktop Footer -->
+    <footer>
+      <div>
+        Status: <strong id="statusText">Ready</strong>
+      </div>
+      <div>
+        Case ID: <span id="footerCaseId" style="font-family:var(--font-mono);">none</span>
+      </div>
+      <div>
+        Platform: <strong>JAALBHEDI v2.4 (SIH 26106)</strong>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const API = "/api";
+    let currentCaseId = null;
+    let currentEmailId = null;
+    let lastAnalysis = null;
+
+    // Realistic Demo Phishing EML
+    const DEMO_PHISHING_EML = `Delivered-To: victim@example-college.edu
+Received: by 10.10.10.10 with SMTP id abc123;
+    Mon, 01 Sep 2025 08:15:22 -0700 (PDT)
+Received: from mail.internal-relay.example.com (mail.internal-relay.example.com. [10.20.30.40])
+    by mx.google.com with ESMTPS id xyz789
+    for <victim@example-college.edu>;
+    Mon, 01 Sep 2025 08:15:20 -0700 (PDT)
+Received: from smtp-out.suspicious-host.net (smtp-out.suspicious-host.net. [185.220.101.45])
+    by mail.internal-relay.example.com with ESMTP id def456;
+    Mon, 01 Sep 2025 08:15:15 -0700 (PDT)
+Authentication-Results: mx.google.com;
+    spf=fail smtp.mailfrom=paypa1-secure.net;
+    dkim=none;
+    dmarc=fail
+Message-ID: <2025090108150077.ABCDEF@paypa1-secure.net>
+Date: Mon, 01 Sep 2025 08:15:00 -0700
+From: "PayPal Security Team" <alerts@paypa1-secure.net>
+Reply-To: recover-support@totally-legit-mail.ru
+Return-Path: <bounce@paypa1-secure.net>
+To: victim@example-college.edu
+Subject: Urgent: Your Account Will Be Suspended - Action Required
+Content-Type: multipart/alternative; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain; charset="utf-8"
+
+Dear Customer,
+
+We have detected unusual activity on your account. Your account will be
+suspended immediately unless you verify your identity within 24 hours.
+
+Please click here now to confirm your password and social security number:
+http://192.168.99.5:8080/paypal-verify/login?redirect=http://paypa1-secure.net
+
+This is a final notice. Action required immediately to avoid permanent
+suspension of your account.
+
+Thank you,
+PayPal Security Team
+
+--boundary123
+Content-Type: text/html; charset="utf-8"
+
+<html><body>
+<p>Dear Customer,</p>
+<p>We have detected <b>unusual activity</b> on your account. Your account
+will be <b>suspended immediately</b> unless you verify your identity within
+24 hours.</p>
+<p><a href="http://xn--pypal-4ve.com/verify">Click here now</a> to confirm
+your password and social security number.</p>
+<script>alert('this should never execute or render');<\\/script>
+<p>This is a final notice.</p>
+</body></html>
+
+--boundary123--`;
+
+    function setStatus(msg) {
+      document.getElementById("statusText").textContent = msg;
+    }
+
+    // Health check
+    async function checkHealth() {
+      try {
+        const r = await fetch(`${API}/health`);
+        const d = await r.json();
+        document.getElementById("backendDot").className = "dot green";
+        document.getElementById("backendText").textContent = "Server Online";
+
+        if (d.cuda_available) {
+          document.getElementById("gpuDot").className = "dot blue";
+          document.getElementById("gpuText").textContent = d.gpu_name ? `GPU: ${d.gpu_name}` : "GPU Active";
+        } else {
+          document.getElementById("gpuDot").className = "dot amber";
+          document.getElementById("gpuText").textContent = "CPU Baseline";
+        }
+      } catch (e) {
+        document.getElementById("backendDot").className = "dot amber";
+        document.getElementById("backendText").textContent = "Server Offline";
+      }
+    }
+
+    // Case creation
+    async function getOrCreateCase() {
+      if (currentCaseId) return currentCaseId;
+      const fd = new FormData();
+      fd.append("analyst", "analyst_1");
+      const r = await fetch(`${API}/cases`, { method: "POST", body: fd });
+      const d = await r.json();
+      currentCaseId = d.case_id;
+      document.getElementById("footerCaseId").textContent = currentCaseId;
+      return currentCaseId;
+    }
+
+    document.getElementById("newCaseBtn").onclick = async () => {
+      currentCaseId = null;
+      await getOrCreateCase();
+      setStatus("New case opened.");
+    };
+
+    // File input change
+    const emlFileInput = document.getElementById("emlFile");
+    emlFileInput.addEventListener("change", () => {
+      if (emlFileInput.files.length > 0) {
+        document.getElementById("fileNameDisplay").textContent = `Selected: ${emlFileInput.files[0].name}`;
+      }
+    });
+
+    // Ingest & Hash
+    document.getElementById("uploadBtn").onclick = async () => {
+      const cid = await getOrCreateCase();
+      const rawText = document.getElementById("rawText").value.trim();
+      const enableNetwork = document.getElementById("enableNetwork").checked;
+
+      const fd = new FormData();
+      if (emlFileInput.files.length > 0) {
+        fd.append("file", emlFileInput.files[0]);
+      } else if (rawText) {
+        fd.append("raw_text", rawText);
+      } else {
+        setStatus("Please select a file or paste raw email content.");
+        return;
+      }
+
+      fd.append("enable_network", enableNetwork);
+      fd.append("analyst_session", "session_user");
+
+      setStatus("Hashing and storing email evidence...");
+      try {
+        const r = await fetch(`${API}/cases/${cid}/upload`, { method: "POST", body: fd });
+        if (!r.ok) {
+          setStatus("Upload failed: " + await r.text());
+          return;
+        }
+        const d = await r.json();
+        currentEmailId = d.email_id;
+        document.getElementById("hashDisplay").textContent = d.sha256;
+        document.getElementById("subjectDisplay").textContent = d.subject || "(No Subject)";
+        document.getElementById("fromDisplay").textContent = d.from || "(Unknown)";
+        document.getElementById("dateDisplay").textContent = d.date || new Date().toLocaleDateString();
+        document.getElementById("analyzeBtn").disabled = false;
+        setStatus("Evidence preserved. Ready to analyze.");
+      } catch (err) {
+        setStatus("Upload error: " + err.message);
+      }
+    };
+
+    // Run Analysis
+    document.getElementById("analyzeBtn").onclick = async () => {
+      if (!currentEmailId) return;
+      const enableNetwork = document.getElementById("enableNetwork").checked;
+      setStatus("Running threat engines (Rules + ML + Relays + Geolocation)...");
+      document.getElementById("analyzeBtn").disabled = true;
+
+      window.isAnalyzing3dActive = true;
+
+      const fd = new FormData();
+      fd.append("enable_network", enableNetwork);
+
+      try {
+        const r = await fetch(`${API}/emails/${currentEmailId}/analyze`, { method: "POST", body: fd });
+        document.getElementById("analyzeBtn").disabled = false;
+        window.isAnalyzing3dActive = false;
+        if (!r.ok) {
+          setStatus("Analysis failed: " + await r.text());
+          return;
+        }
+        const data = await r.json();
+        lastAnalysis = data;
+        renderResults(data);
+        document.getElementById("exportBtn").disabled = false;
+        setStatus("Analysis complete.");
+      } catch (err) {
+        document.getElementById("analyzeBtn").disabled = false;
+        window.isAnalyzing3dActive = false;
+        setStatus("Analysis error: " + err.message);
+      }
+    };
+
+    // Render Results in Clean Human-Made UI
+    function renderResults(d) {
+      const ts = d.threat_score;
+      const score = Math.round(ts.final_score);
+
+      // Score circle & verdict badge
+      document.getElementById("scoreValue").textContent = score;
+      const circle = document.getElementById("scoreCircle");
+      const badge = document.getElementById("verdictBadge");
+
+      if (score >= 60) {
+        circle.style.borderColor = "var(--red)";
+        badge.className = "badge red";
+        badge.textContent = "High Risk Threat";
+      } else if (score >= 30) {
+        circle.style.borderColor = "var(--amber)";
+        badge.className = "badge amber";
+        badge.textContent = "Suspicious";
+      } else {
+        circle.style.borderColor = "var(--green)";
+        badge.className = "badge green";
+        badge.textContent = "Clean / Low Risk";
+      }
+
+      document.getElementById("verdictText").textContent =
+        `Category: ${ts.category.replace(/_/g, " ").toUpperCase()} (${score}/100)`;
+      document.getElementById("confidenceLabel").textContent = `Confidence: ${ts.confidence.toUpperCase()}`;
+
+      // Plain-English Reasons
+      const allReasons = [];
+      (ts.contributions || []).forEach(c => {
+        if (c.reasons && c.reasons.length > 0) {
+          c.reasons.forEach(r => allReasons.push(r));
+        }
+      });
+
+      const reasonsBox = document.getElementById("reasonsBox");
+      const reasonsList = document.getElementById("reasonsList");
+      if (allReasons.length > 0) {
+        reasonsBox.style.display = "block";
+        reasonsList.innerHTML = allReasons.map(r => `<li>${escapeHtml(r)}</li>`).join("");
+      } else {
+        reasonsBox.style.display = "none";
+      }
+
+      // Sender Auth (SPF/DKIM/DMARC)
+      const authTable = document.getElementById("authTableBody");
+      const authResults = (d.authentication && d.authentication.header_results) || [];
+      if (authResults.length > 0) {
+        authTable.innerHTML = authResults.map(a => {
+          const res = (a.result || "").toLowerCase();
+          const pillClass = res === "pass" ? "green" : res === "fail" ? "red" : "gray";
+          return `
+            <tr>
+              <td><strong>${a.mechanism.toUpperCase()}</strong></td>
+              <td><span class="pill ${pillClass}">${a.result.toUpperCase()}</span></td>
+              <td style="font-family:var(--font-mono); font-size:11px;">${escapeHtml(a.source || "Header")}</td>
+            </tr>
+          `;
+        }).join("");
+      } else {
+        authTable.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No authentication headers found</td></tr>`;
+      }
+
+      // Relay Hops & Origin
+      const origin = d.header_findings && d.header_findings.candidate_origin_ip;
+      if (origin) {
+        document.getElementById("originIpBox").textContent = origin.ip;
+        document.getElementById("originIpLabel").textContent = `Probable Origin: ${origin.ip}`;
+      } else {
+        document.getElementById("originIpBox").textContent = "None detected";
+      }
+
+      const geo = (d.geolocation_results && d.geolocation_results[0]) || null;
+      if (geo) {
+        document.getElementById("originGeoBox").textContent = `${geo.city || "Unknown City"}, ${geo.country || "—"}`;
+      } else {
+        document.getElementById("originGeoBox").textContent = "Location unmapped";
+      }
+
+      const hops = (d.header_findings && d.header_findings.hops) || [];
+      const hopsTable = document.getElementById("hopsTableBody");
+      if (hops.length > 0) {
+        hopsTable.innerHTML = hops.map(h => {
+          const pillClass = h.trust_level === "trusted" ? "green" : h.trust_level === "boundary" ? "amber" : "red";
+          return `
+            <tr>
+              <td style="font-weight:600;">#${h.hop_index}</td>
+              <td style="font-family:var(--font-mono);">${h.ip || "—"}</td>
+              <td>${escapeHtml(h.hostname || "unknown")}</td>
+              <td><span class="pill ${pillClass}">${h.trust_level}</span></td>
+            </tr>
+          `;
+        }).join("");
+      } else {
+        hopsTable.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No hops found</td></tr>`;
+      }
+
+      // Extracted URLs
+      const urls = (d.content_indicators && d.content_indicators.urls) || [];
+      const urlsTable = document.getElementById("urlsTableBody");
+      document.getElementById("linksCount").textContent = `${urls.length} link${urls.length === 1 ? '' : 's'} found`;
+      if (urls.length > 0) {
+        urlsTable.innerHTML = urls.map(u => {
+          const pillClass = u.severity === "high" ? "red" : u.severity === "medium" ? "amber" : "green";
+          const flags = [
+            u.is_ip_literal && "Numeric IP",
+            u.is_punycode && "Lookalike / Punycode",
+            u.has_suspicious_port && "Odd Port"
+          ].filter(Boolean).join(", ") || "Standard URL";
+          return `
+            <tr>
+              <td style="font-family:var(--font-mono); font-size:11px; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(u.url)}">
+                ${escapeHtml(u.url)}
+              </td>
+              <td><span class="pill ${pillClass}">${u.severity}</span></td>
+              <td style="color:var(--text-muted); font-size:11px;">${flags}</td>
+            </tr>
+          `;
+        }).join("");
+      } else {
+        urlsTable.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">No external links found in email</td></tr>`;
+      }
+
+      // Cues
+      const cues = (d.content_indicators && d.content_indicators.content_cues) || [];
+      const cuesBox = document.getElementById("cuesBox");
+      if (cues.length > 0) {
+        cuesBox.style.display = "block";
+        document.getElementById("cuesContent").textContent = cues.map(c => `"${c.value}" (${c.type})`).join(" · ");
+      } else {
+        cuesBox.style.display = "none";
+      }
+    }
+
+    // Export Report
+    document.getElementById("exportBtn").onclick = async () => {
+      if (!lastAnalysis || !currentCaseId) return;
+      setStatus("Generating forensic report...");
+      try {
+        const r = await fetch(`${API}/cases/${currentCaseId}/report`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(lastAnalysis)
+        });
+        if (!r.ok) {
+          setStatus("Report generation failed: " + await r.text());
+          return;
+        }
+        const data = await r.json();
+        document.getElementById("reportLinks").style.display = "flex";
+        document.getElementById("pdfLink").href = `${API}/reports/download?path=${encodeURIComponent(data.pdf_report_path)}`;
+        document.getElementById("jsonLink").href = `${API}/reports/download?path=${encodeURIComponent(data.json_report_path)}`;
+        setStatus("Report ready for download.");
+      } catch (err) {
+        setStatus("Report error: " + err.message);
+      }
+    };
+
+    // Copy hash helper
+    document.getElementById("copyHashBtn").onclick = () => {
+      const h = document.getElementById("hashDisplay").textContent;
+      if (h && !h.includes("Not ingested")) {
+        navigator.clipboard.writeText(h);
+        setStatus("SHA-256 hash copied.");
+      }
+    };
+
+    function escapeHtml(s) {
+      if (!s) return "";
+      const div = document.createElement("div");
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    // ====================================================
+    // Pure 3D Global Internet Motion Engine (Zero Text)
+    // 3D Cyber Globe, World Server Nodes, Fiber Arcs & Data Packets
+    // ====================================================
+    function init3DMotionSymbol() {
+      const canvas = document.getElementById("motionCanvas3d");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      let width = canvas.clientWidth || 360;
+      let height = canvas.clientHeight || 340;
+
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        width = canvas.clientWidth || 360;
+        height = canvas.clientHeight || 340;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      // Interactive mouse tilt with smooth damping
+      let targetTiltX = 0.22, targetTiltY = 0;
+      let curTiltX = 0.22, curTiltY = 0;
+
+      canvas.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        targetTiltX = y * 0.95;
+        targetTiltY = x * 0.95;
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        targetTiltX = 0.22;
+        targetTiltY = 0;
+      });
+
+      const GLOBE_R = 100; // Expanded globe size to fill the space
+      const FOV = 360;
+
+      // 1. Generate Latitude Circles (Parallels)
+      const parallels = [];
+      const latAngles = [-65, -45, -25, 0, 25, 45, 65];
+      latAngles.forEach(deg => {
+        const rad = (deg * Math.PI) / 180;
+        const ringR = Math.cos(rad) * GLOBE_R;
+        const ringY = -Math.sin(rad) * GLOBE_R;
+        const segments = 48;
+        const pts = [];
+        for (let i = 0; i <= segments; i++) {
+          const a = (i / segments) * Math.PI * 2;
+          pts.push({ x: Math.cos(a) * ringR, y: ringY, z: Math.sin(a) * ringR });
+        }
+        parallels.push({ pts, isEquator: deg === 0 });
+      });
+
+      // 2. Generate Longitude Circles (Meridians)
+      const meridians = [];
+      const meridianCount = 8;
+      for (let m = 0; m < meridianCount; m++) {
+        const lon = (m / meridianCount) * Math.PI;
+        const segments = 48;
+        const pts = [];
+        for (let i = 0; i <= segments; i++) {
+          const a = (i / segments) * Math.PI * 2;
+          const y = Math.sin(a) * GLOBE_R;
+          const r = Math.cos(a) * GLOBE_R;
+          const x = Math.sin(lon) * r;
+          const z = Math.cos(lon) * r;
+          pts.push({ x, y, z });
+        }
+        meridians.push(pts);
+      }
+
+      // 3. Global Internet Infrastructure Nodes (Server / Relay Hubs on Earth)
+      const nodeSpherical = [
+        // North America
+        { lat: 0.65, lon: -1.7 }, { lat: 0.72, lon: -1.3 }, { lat: 0.55, lon: -2.0 }, { lat: 0.48, lon: -1.4 },
+        // Europe & UK
+        { lat: 0.90, lon: -0.05 }, { lat: 0.84, lon: 0.22 }, { lat: 0.96, lon: 0.18 }, { lat: 0.78, lon: 0.40 },
+        // Asia & India
+        { lat: 0.49, lon: 1.35 }, { lat: 0.35, lon: 1.30 }, { lat: 0.58, lon: 2.05 }, { lat: 0.62, lon: 2.45 },
+        // East Asia & Japan
+        { lat: 0.61, lon: 2.42 }, { lat: 0.22, lon: 1.80 },
+        // South America
+        { lat: -0.40, lon: -0.85 }, { lat: -0.58, lon: -1.0 },
+        // Africa & Middle East
+        { lat: 0.50, lon: 0.85 }, { lat: -0.15, lon: 0.65 }, { lat: -0.55, lon: 0.45 },
+        // Oceania / Australia
+        { lat: -0.55, lon: 2.50 }, { lat: -0.65, lon: 2.65 }
+      ];
+
+      const nodes = nodeSpherical.map((n, id) => {
+        const x = GLOBE_R * Math.cos(n.lat) * Math.sin(n.lon);
+        const y = -GLOBE_R * Math.sin(n.lat);
+        const z = GLOBE_R * Math.cos(n.lat) * Math.cos(n.lon);
+        return { id, x, y, z, lat: n.lat, lon: n.lon };
+      });
+
+      // 4. Global Internet Routing Arcs (Intercontinental Fiber / Internet Connections)
+      const linkPairs = [
+        [0, 4], [1, 5], [4, 8], [5, 9], [8, 10], [10, 12],
+        [12, 2], [3, 14], [4, 16], [16, 8], [8, 19], [12, 19],
+        [14, 18], [16, 17], [0, 2], [4, 7], [10, 13], [13, 19]
+      ];
+
+      // Build elevated 3D arc points for each connection
+      const connectionArcs = linkPairs.map(([fromIdx, toIdx]) => {
+        const A = nodes[fromIdx];
+        const B = nodes[toIdx];
+        const magA = Math.hypot(A.x, A.y, A.z);
+        const magB = Math.hypot(B.x, B.y, B.z);
+        const uA = { x: A.x / magA, y: A.y / magA, z: A.z / magA };
+        const uB = { x: B.x / magB, y: B.y / magB, z: B.z / magB };
+
+        const dot = Math.max(-1, Math.min(1, uA.x * uB.x + uA.y * uB.y + uA.z * uB.z));
+        const omega = Math.acos(dot);
+        const sinOmega = Math.sin(omega);
+
+        const segments = 16;
+        const arcPoints = [];
+        for (let s = 0; s <= segments; s++) {
+          const t = s / segments;
+          let ux, uy, uz;
+          if (sinOmega > 0.001) {
+            const wA = Math.sin((1 - t) * omega) / sinOmega;
+            const wB = Math.sin(t * omega) / sinOmega;
+            ux = wA * uA.x + wB * uB.x;
+            uy = wA * uA.y + wB * uB.y;
+            uz = wA * uA.z + wB * uB.z;
+          } else {
+            ux = uA.x * (1 - t) + uB.x * t;
+            uy = uA.y * (1 - t) + uB.y * t;
+            uz = uA.z * (1 - t) + uB.z * t;
+          }
+          const uMag = Math.hypot(ux, uy, uz) || 1;
+          const elevation = GLOBE_R * (1.0 + 0.16 * Math.sin(t * Math.PI));
+          arcPoints.push({
+            x: (ux / uMag) * elevation,
+            y: (uy / uMag) * elevation,
+            z: (uz / uMag) * elevation
+          });
+        }
+        return { fromIdx, toIdx, points: arcPoints };
+      });
+
+      // 5. Live Internet Data Packets / Beacons Traveling Along Connections
+      const packetCount = 14;
+      const packets = [];
+      for (let i = 0; i < packetCount; i++) {
+        packets.push({
+          arcIndex: i % connectionArcs.length,
+          t: Math.random(),
+          speed: 0.28 + Math.random() * 0.22,
+          color: i % 3 === 0 ? "#38bdf8" : i % 3 === 1 ? "#60a5fa" : "#34d399"
+        });
+      }
+
+      // 6. Oblique Internet Satellite Orbit
+      const satOrbitR = 136;
+      const satOrbitPts = [];
+      for (let i = 0; i <= 48; i++) {
+        const a = (i / 48) * Math.PI * 2;
+        satOrbitPts.push({ x: Math.cos(a) * satOrbitR, y: 0, z: Math.sin(a) * satOrbitR });
+      }
+
+      // 7. Ambient Floating Depth / Constellation Particles
+      const particleCount = 36;
+      const particles = [];
+      for (let i = 0; i < particleCount; i++) {
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(Math.random() * 2 - 1);
+        const rad = GLOBE_R * 1.35 + Math.random() * 55;
+        particles.push({
+          x: rad * Math.sin(phi) * Math.cos(theta),
+          y: rad * Math.sin(phi) * Math.sin(theta),
+          z: rad * Math.cos(phi),
+          speed: 0.003 + Math.random() * 0.006,
+          size: 1.1 + Math.random() * 1.6
+        });
+      }
+
+      // Rotation & Speed Multipliers
+      let globeYaw = 0;
+      let satAngle = 0;
+      let currentSpeedMultiplier = 1.0;
+
+      // 3D Matrix Rotation Helpers
+      function rotX(p, sin, cos) {
+        return { x: p.x, y: p.y * cos - p.z * sin, z: p.y * sin + p.z * cos };
+      }
+      function rotY(p, sin, cos) {
+        return { x: p.x * cos + p.z * sin, y: p.y, z: -p.x * sin + p.z * cos };
+      }
+
+      function project(p, cx, cy) {
+        const z = p.z;
+        const scale = FOV / (FOV + z + 120);
+        return {
+          x: cx + p.x * scale,
+          y: cy + p.y * scale,
+          z: z,
+          scale: scale
+        };
+      }
+
+      let lastTime = performance.now();
+
+      function render(now) {
+        const dt = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+
+        // Smooth cursor tilt interpolation
+        curTiltX += (targetTiltX - curTiltX) * 0.08;
+        curTiltY += (targetTiltY - curTiltY) * 0.08;
+
+        // Threat analysis acceleration
+        const targetMult = window.isAnalyzing3dActive ? 4.2 : 1.0;
+        currentSpeedMultiplier += (targetMult - currentSpeedMultiplier) * 0.06;
+
+        // Advance planetary rotation (Earth spinning on its axis)
+        globeYaw += 0.35 * dt * currentSpeedMultiplier;
+        satAngle += 0.75 * dt * currentSpeedMultiplier;
+
+        ctx.clearRect(0, 0, width, height);
+
+        const cx = width / 2;
+        const cy = height / 2;
+
+        const sinTiltX = Math.sin(curTiltX);
+        const cosTiltX = Math.cos(curTiltX);
+        const sinTiltY = Math.sin(curTiltY + globeYaw);
+        const cosTiltY = Math.cos(curTiltY + globeYaw);
+
+        function transformGlobePoint(pt) {
+          let p = rotY(pt, sinTiltY, cosTiltY);
+          p = rotX(p, sinTiltX, cosTiltX);
+          return p;
+        }
+
+        // --- LAYER 1: Parallels (Latitude Lines) ---
+        parallels.forEach(ring => {
+          const projPts = ring.pts.map(pt => project(transformGlobePoint(pt), cx, cy));
+          ctx.save();
+          ctx.lineWidth = ring.isEquator ? 1.4 : 0.85;
+          if (ring.isEquator) {
+            ctx.setLineDash([4, 3]);
+          }
+
+          for (let i = 0; i < projPts.length - 1; i++) {
+            const pA = projPts[i];
+            const pB = projPts[i + 1];
+            const avgZ = (pA.z + pB.z) / 2;
+            const isFront = avgZ > -10;
+            const alpha = isFront
+              ? Math.max(0.25, Math.min(0.85, 0.3 + (avgZ / GLOBE_R) * 0.55))
+              : Math.max(0.06, 0.18 + (avgZ / GLOBE_R) * 0.12);
+
+            ctx.strokeStyle = isFront
+              ? (ring.isEquator ? `rgba(56, 189, 248, ${alpha})` : `rgba(148, 163, 184, ${alpha})`)
+              : `rgba(51, 65, 85, ${alpha})`;
+
+            ctx.beginPath();
+            ctx.moveTo(pA.x, pA.y);
+            ctx.lineTo(pB.x, pB.y);
+            ctx.stroke();
+          }
+          ctx.restore();
+        });
+
+        // --- LAYER 2: Meridians (Longitude Lines) ---
+        meridians.forEach(pts => {
+          const projPts = pts.map(pt => project(transformGlobePoint(pt), cx, cy));
+          ctx.save();
+          ctx.lineWidth = 0.85;
+
+          for (let i = 0; i < projPts.length - 1; i++) {
+            const pA = projPts[i];
+            const pB = projPts[i + 1];
+            const avgZ = (pA.z + pB.z) / 2;
+            const isFront = avgZ > -10;
+            const alpha = isFront
+              ? Math.max(0.2, Math.min(0.75, 0.25 + (avgZ / GLOBE_R) * 0.5))
+              : Math.max(0.05, 0.16 + (avgZ / GLOBE_R) * 0.1);
+
+            ctx.strokeStyle = isFront
+              ? `rgba(148, 163, 184, ${alpha})`
+              : `rgba(51, 65, 85, ${alpha})`;
+
+            ctx.beginPath();
+            ctx.moveTo(pA.x, pA.y);
+            ctx.lineTo(pB.x, pB.y);
+            ctx.stroke();
+          }
+          ctx.restore();
+        });
+
+        // --- LAYER 3: Oblique Satellite Orbit Ring ---
+        const sinSatTilt = Math.sin(0.45 + curTiltX);
+        const cosSatTilt = Math.cos(0.45 + curTiltX);
+        const projOrbit = satOrbitPts.map(pt => {
+          let p = rotY(pt, Math.sin(satAngle * 0.4), Math.cos(satAngle * 0.4));
+          p = rotX(p, sinSatTilt, cosSatTilt);
+          return project(p, cx, cy);
+        });
+
+        ctx.save();
+        ctx.lineWidth = 1.0;
+        ctx.setLineDash([3, 4]);
+        for (let i = 0; i < projOrbit.length - 1; i++) {
+          const pA = projOrbit[i];
+          const pB = projOrbit[i + 1];
+          const avgZ = (pA.z + pB.z) / 2;
+          const alpha = Math.max(0.12, Math.min(0.65, (avgZ + satOrbitR) / (2 * satOrbitR)));
+          ctx.strokeStyle = `rgba(56, 189, 248, ${alpha.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.moveTo(pA.x, pA.y);
+          ctx.lineTo(pB.x, pB.y);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Orbiting Satellite Beacon
+        const satPos = {
+          x: Math.cos(satAngle * 2.2) * satOrbitR,
+          y: 0,
+          z: Math.sin(satAngle * 2.2) * satOrbitR
+        };
+        let satRot = rotY(satPos, Math.sin(satAngle * 0.4), Math.cos(satAngle * 0.4));
+        satRot = rotX(satRot, sinSatTilt, cosSatTilt);
+        const projSat = project(satRot, cx, cy);
+
+        // Satellite Body & Cross-Solar Panels
+        const satAlpha = Math.max(0.3, Math.min(1.0, (projSat.z + satOrbitR) / (2 * satOrbitR)));
+        ctx.fillStyle = `rgba(248, 250, 252, ${satAlpha})`;
+        ctx.beginPath();
+        ctx.arc(projSat.x, projSat.y, 3.2 * projSat.scale, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = `rgba(56, 189, 248, ${satAlpha})`;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(projSat.x - 7 * projSat.scale, projSat.y);
+        ctx.lineTo(projSat.x + 7 * projSat.scale, projSat.y);
+        ctx.stroke();
+
+        // --- LAYER 4: Elevated Intercontinental Routing Arcs (Internet Web Links) ---
+        connectionArcs.forEach(arc => {
+          const projArc = arc.points.map(pt => project(transformGlobePoint(pt), cx, cy));
+          for (let i = 0; i < projArc.length - 1; i++) {
+            const pA = projArc[i];
+            const pB = projArc[i + 1];
+            const avgZ = (pA.z + pB.z) / 2;
+            const isFront = avgZ > -25;
+            const alpha = isFront
+              ? Math.max(0.2, Math.min(0.9, 0.35 + (avgZ / GLOBE_R) * 0.55))
+              : Math.max(0.04, 0.12 + (avgZ / GLOBE_R) * 0.08);
+
+            ctx.lineWidth = isFront ? 1.5 : 0.8;
+            ctx.strokeStyle = isFront
+              ? `rgba(56, 189, 248, ${alpha.toFixed(3)})`
+              : `rgba(71, 85, 105, ${alpha.toFixed(3)})`;
+            ctx.beginPath();
+            ctx.moveTo(pA.x, pA.y);
+            ctx.lineTo(pB.x, pB.y);
+            ctx.stroke();
+          }
+        });
+
+        // --- LAYER 5: Live Internet Data Packets / Pulses Moving Along Connections ---
+        packets.forEach(pkt => {
+          pkt.t += pkt.speed * dt * currentSpeedMultiplier;
+          if (pkt.t > 1.0) {
+            pkt.t = 0;
+            pkt.arcIndex = Math.floor(Math.random() * connectionArcs.length);
+          }
+
+          const arc = connectionArcs[pkt.arcIndex];
+          const segCount = arc.points.length - 1;
+          const exactIdx = pkt.t * segCount;
+          const iA = Math.floor(exactIdx);
+          const iB = Math.min(segCount, iA + 1);
+          const frac = exactIdx - iA;
+
+          const ptA = arc.points[iA];
+          const ptB = arc.points[iB];
+          const interpPt = {
+            x: ptA.x + (ptB.x - ptA.x) * frac,
+            y: ptA.y + (ptB.y - ptA.y) * frac,
+            z: ptA.z + (ptB.z - ptA.z) * frac
+          };
+
+          const pProj = project(transformGlobePoint(interpPt), cx, cy);
+          if (pProj.z > -30) {
+            const alpha = Math.max(0.35, Math.min(1.0, (pProj.z + 40) / (GLOBE_R + 40)));
+            ctx.fillStyle = pkt.color === "#34d399"
+              ? `rgba(52, 211, 153, ${alpha})`
+              : `rgba(56, 189, 248, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(pProj.x, pProj.y, 4.5 * pProj.scale, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(pProj.x, pProj.y, 2.2 * pProj.scale, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        // --- LAYER 6: Global Internet Server / Relay Nodes (Hubs) ---
+        nodes.forEach(node => {
+          const pTrans = transformGlobePoint(node);
+          const p = project(pTrans, cx, cy);
+
+          const normalZ = pTrans.z / GLOBE_R;
+          if (normalZ > -0.15) {
+            const alpha = Math.max(0.25, Math.min(1.0, normalZ * 1.15));
+            const r = Math.max(2, 3.8 * p.scale);
+
+            ctx.fillStyle = `rgba(248, 250, 252, ${alpha.toFixed(3)})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = `rgba(56, 189, 248, ${(alpha * 0.8).toFixed(3)})`;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, r + 2.5, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        });
+
+        // --- LAYER 7: Ambient Depth / Constellation Particles ---
+        particles.forEach(pt => {
+          let curA = Math.atan2(pt.z, pt.x) + pt.speed * currentSpeedMultiplier;
+          const rad = Math.hypot(pt.x, pt.z);
+          pt.x = Math.cos(curA) * rad;
+          pt.z = Math.sin(curA) * rad;
+
+          let pRot = rotY(pt, Math.sin(curTiltY), Math.cos(curTiltY));
+          pRot = rotX(pRot, sinTiltX, cosTiltX);
+          const pr = project(pRot, cx, cy);
+
+          const alpha = Math.max(0.06, Math.min(0.65, (pr.z + 120) / 240));
+          ctx.fillStyle = `rgba(148, 163, 184, ${alpha.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(pr.x, pr.y, pt.size * pr.scale, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+    }
+
+    init3DMotionSymbol();
+    checkHealth();
+  </script>
+</body>
+</html>

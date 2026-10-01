@@ -1,0 +1,84 @@
+# =====================================================================
+# JAALBHEDI (SIH26106) .gitignore
+# Clean repository rules - excludes virtual environments, 
+# 16GB disk forensics dumps, local databases, keys, and caches.
+# =====================================================================
+
+# --- Python Virtual Environments ---
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Python Bytecode & Caches ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# --- Node & Frontend Build Artifacts ---
+node_modules/
+frontend-react/node_modules/
+dist/
+build/
+.vite/
+frontend_react_dist_backup/
+# Sensitive / raw forensic evidence
+evidence/*.bin
+evidence/*Password*
+# --- Forensic Disk Dumps, Heavy Raw Images & Archives ---
+# DO NOT PUSH 16GB DISK IMAGES OR RAW DUMPS TO GITHUB
+evidence/extracted/
+evidence/*.001
+evidence/*.raw
+evidence/*.dd
+evidence/*.img
+evidence/*.iso
+evidence/*.rar
+*.rar
+*.zip
+*.7z
+*.tar.gz
+
+# --- Local Databases & Runtime Reports ---
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
+data/sih26106.db
+data/reports/*.pdf
+data/reports/*.json
+!data/reports/.gitkeep
+
+# --- Security Keys, Certificates & Secrets (Generated on first run) ---
+*.key
+*.pem
+data/vault.key
+data/report_signing.key
+data/rsa_private.pem
+data/rsa_public.pem
+.env
+.env.local
+.env.*.local
+
+# --- Scratchpad & Executable Installers ---
+scratch/
+*.exe
+
+# --- Operating System & IDE Files ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Email forensic evidence
+evidence/*.eml

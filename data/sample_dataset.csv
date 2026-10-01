@@ -1,0 +1,31 @@
+text,label
+"Your account will be suspended immediately. Verify your password now by clicking this link.",phishing
+"Urgent: final notice, your invoice is overdue. Wire transfer required today to avoid penalty.",phishing
+"Dear user, confirm your identity and social security number to unlock your account.",phishing
+"Click here now to claim your prize, limited time offer expires today!",phishing
+"Your PayPal account has been limited. Verify your login credentials immediately.",phishing
+"Action required: update your billing details or your subscription will be cancelled.",phishing
+"We noticed unusual activity, please enter your one-time password to confirm it's you.",phishing
+"Please send the gift card codes as soon as possible, I'm in a meeting and can't call.",phishing
+"Your bank details need to be updated, click the secure link to verify your routing number.",phishing
+"CEO here, need you to process an urgent wire transfer today, keep this confidential.",phishing
+"Hi team, attaching the quarterly report for review before Friday's meeting.",legitimate
+"Reminder: our weekly sync is moved to 3 PM tomorrow in conference room B.",legitimate
+"Thanks for sending the notes, I'll review them and get back to you by Thursday.",legitimate
+"Here is the agenda for next week's project planning session.",legitimate
+"Can we reschedule our call to next Monday? I have a conflict this week.",legitimate
+"Please find attached the signed contract for your records.",legitimate
+"Happy birthday! Hope you have a wonderful day with family and friends.",legitimate
+"The library will be closed this weekend for maintenance work.",legitimate
+"Your order has shipped and will arrive within 3-5 business days.",legitimate
+"Looking forward to catching up over coffee next week.",legitimate
+"Congratulations on your promotion, well deserved after all your hard work this year.",legitimate
+"Please review the attached meeting minutes and let me know if I missed anything.",legitimate
+"Your subscription renewal was processed successfully, thank you for your continued support.",legitimate
+"We are hiring for a new backend engineer role, please share with your network.",legitimate
+"Your verification code is required to complete this urgent security check on your account.",phishing
+"Final warning: your mailbox storage is full, click here to increase your quota immediately.",phishing
+"I need you to purchase gift cards urgently and send me the codes before end of day.",phishing
+"Confirm your password reset request within 24 hours or your account will be locked.",phishing
+"Attached is the updated budget spreadsheet for Q3 planning discussion.",legitimate
+"Let's grab lunch this Friday to discuss the new project timeline.",legitimate
